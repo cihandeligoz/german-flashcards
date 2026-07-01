@@ -5,7 +5,8 @@ const STORAGE_KEY = "deutsch-flashcards-v2";
 // Bump whenever the seed vocabulary changes. A stored deck from an older seed
 // generation is refreshed on load — but only when the user hasn't added their
 // own cards or built up any study history, so real progress is never lost.
-const SEED_VERSION = 2;
+// v3 added the A2 vocabulary set and the `cefr` badge field.
+const SEED_VERSION = 3;
 
 /** First-run state: seeded with the current A1 vocabulary. */
 function initialState(): AppState {
@@ -33,7 +34,10 @@ export function loadState(): AppState {
       return initialState();
     }
 
-    return { cards, reviews, seedVersion };
+    // A personalized deck is kept as-is, but ensure every card carries a `cefr`
+    // badge — decks stored before v3 predate the field, so default them to A1.
+    const normalized = cards.map((c) => ({ ...c, cefr: c.cefr ?? "A1" }));
+    return { cards: normalized, reviews, seedVersion };
   } catch {
     // Corrupt or unavailable storage — start fresh rather than crashing.
     return initialState();

@@ -10,6 +10,7 @@ function userCard(): Flashcard {
     german: "eigenes Wort",
     english: "own word",
     examples: [],
+    cefr: "A2",
     level: 3,
     timesSeen: 2,
     timesKnown: 1,
@@ -27,7 +28,7 @@ describe("storage", () => {
   it("seeds the full deck on first run", () => {
     const state = loadState();
     expect(state.cards.length).toBeGreaterThan(100);
-    expect(state.seedVersion).toBe(2);
+    expect(state.seedVersion).toBe(3);
     // Seed ids are namespaced so they never collide with user cards.
     expect(state.cards.every((c) => c.id.startsWith("seed-"))).toBe(true);
   });
@@ -44,7 +45,7 @@ describe("storage", () => {
     localStorage.setItem(KEY, JSON.stringify(stale));
 
     const state = loadState();
-    expect(state.seedVersion).toBe(2);
+    expect(state.seedVersion).toBe(3);
     expect(state.cards.length).toBeGreaterThan(100); // reseeded
   });
 
@@ -73,6 +74,6 @@ describe("storage", () => {
     localStorage.setItem(KEY, "{not valid json");
     const state = loadState();
     expect(state.cards.length).toBeGreaterThan(100);
-    expect(state.seedVersion).toBe(2);
+    expect(state.seedVersion).toBe(3);
   });
 });

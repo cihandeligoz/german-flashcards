@@ -38,6 +38,9 @@ export function StudyMode({ cards, onAnswer, goToAdd }: Props) {
       </div>
 
       <div className="flashcard">
+        <span className={`cefr-chip cefr-chip--corner cefr-chip--${card.cefr}`}>
+          {card.cefr}
+        </span>
         <span className="flashcard__label">German</span>
         <p className="flashcard__word">{card.german}</p>
 

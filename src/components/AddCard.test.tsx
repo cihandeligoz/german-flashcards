@@ -29,6 +29,7 @@ describe("AddCard", () => {
     expect(onAdd).toHaveBeenCalledWith({
       german: "die Katze",
       english: "the cat",
+      cefr: "A1",
       examples: [],
     });
   });

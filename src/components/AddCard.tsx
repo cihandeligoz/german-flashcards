@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Flashcard, NewCardInput } from "@/domain";
+import type { CefrLevel, Flashcard, NewCardInput } from "@/domain";
 import { generateExamples } from "@/services";
 
 interface Props {
@@ -12,6 +12,7 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
   const [german, setGerman] = useState("");
   const [english, setEnglish] = useState("");
   const [examplesText, setExamplesText] = useState("");
+  const [cefr, setCefr] = useState<CefrLevel>("A1");
   const [generating, setGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
@@ -47,6 +48,7 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
     onAdd({
       german,
       english,
+      cefr,
       examples: examplesText
         .split("\n")
         .map((l) => l.trim())
@@ -55,6 +57,7 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
     setGerman("");
     setEnglish("");
     setExamplesText("");
+    setCefr("A1");
     setAiError(null);
   }
 
@@ -80,6 +83,17 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
             onChange={(e) => setEnglish(e.target.value)}
             placeholder="e.g. the house"
           />
+        </label>
+
+        <label className="field">
+          <span>Level</span>
+          <select
+            value={cefr}
+            onChange={(e) => setCefr(e.target.value as CefrLevel)}
+          >
+            <option value="A1">A1</option>
+            <option value="A2">A2</option>
+          </select>
         </label>
 
         <label className="field">
@@ -124,6 +138,9 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
             {cards.map((c) => (
               <li key={c.id} className="card-list__item">
                 <div>
+                  <span className={`cefr-chip cefr-chip--${c.cefr}`}>
+                    {c.cefr}
+                  </span>
                   <strong>{c.german}</strong>
                   <span className="muted"> — {c.english}</span>
                   <span className={`pill pill--lvl${c.level}`}>

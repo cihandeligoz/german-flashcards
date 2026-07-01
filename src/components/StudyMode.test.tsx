@@ -10,6 +10,7 @@ function makeCard(overrides: Partial<Flashcard> = {}): Flashcard {
     german: "das Haus",
     english: "the house",
     examples: ["Das Haus ist groß. (The house is big.)"],
+    cefr: "A1",
     level: 1,
     timesSeen: 0,
     timesKnown: 0,
@@ -39,6 +40,17 @@ describe("StudyMode", () => {
     );
     expect(screen.getByText("Card 1 / 2")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /previous/i })).toBeDisabled();
+  });
+
+  it("shows the CEFR level badge for the current card", () => {
+    render(
+      <StudyMode
+        cards={[makeCard({ cefr: "A2" })]}
+        onAnswer={vi.fn()}
+        goToAdd={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("A2")).toBeInTheDocument();
   });
 
   it("reveals the answer and records a correct response", async () => {

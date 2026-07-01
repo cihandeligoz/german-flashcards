@@ -25,6 +25,7 @@ export function flashcardsReducer(
         german: action.input.german.trim(),
         english: action.input.english.trim(),
         examples: action.input.examples.map((e) => e.trim()).filter(Boolean),
+        cefr: action.input.cefr,
         level: 1,
         timesSeen: 0,
         timesKnown: 0,

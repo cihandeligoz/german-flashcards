@@ -1,8 +1,13 @@
+/** CEFR proficiency level, shown as a badge on each card. */
+export type CefrLevel = "A1" | "A2";
+
 export interface Flashcard {
   id: string;
   german: string;
   english: string;
   examples: string[];
+  /** CEFR level (A1/A2) — distinct from the Leitner `level` box below. */
+  cefr: CefrLevel;
   /**
    * Leitner-style box level (1 = struggling, 5 = mastered). Lower levels are
    * shown more often. A wrong answer drops the card to level 1; a correct one
@@ -37,6 +42,7 @@ export interface NewCardInput {
   german: string;
   english: string;
   examples: string[];
+  cefr: CefrLevel;
 }
 
 export const MIN_LEVEL = 1;

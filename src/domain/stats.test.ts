@@ -11,6 +11,7 @@ const card: Flashcard = {
   german: "das Haus",
   english: "the house",
   examples: [],
+  cefr: "A1",
   level: 1,
   timesSeen: 0,
   timesKnown: 0,

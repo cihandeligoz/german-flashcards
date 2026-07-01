@@ -1,4 +1,4 @@
-import type { Flashcard } from "./types";
+import type { CefrLevel, Flashcard } from "./types";
 
 /** Raw seed content — full Flashcard fields are filled in by `seedCards()`. */
 interface SeedEntry {
@@ -12,7 +12,7 @@ interface SeedEntry {
  * organized by the standard A1 topic areas. Each entry has an English
  * translation and one natural example sentence (German + English).
  */
-const SEED: SeedEntry[] = [
+const A1_SEED: SeedEntry[] = [
   // ── Greetings & polite expressions ─────────────────────────────
   {
     german: "Hallo",
@@ -1717,21 +1717,924 @@ const SEED: SeedEntry[] = [
 ];
 
 /**
- * Build full Flashcard objects from the seed content. IDs are derived from the
- * index (stable, no timestamp/random needed) and prefixed so they never collide
- * with user-created cards.
+ * Goethe-Zertifikat A2 vocabulary. Builds on A1 with more abstract nouns,
+ * feelings, work & education, travel, environment, media, opinions, and a
+ * wider set of verbs, adjectives, and connectors. Same format as A1.
  */
-export function seedCards(): Flashcard[] {
-  return SEED.map((entry, i) => ({
-    id: `seed-${i}`,
+const A2_SEED: SeedEntry[] = [
+  // ── Feelings & personality ─────────────────────────────────────
+  {
+    german: "die Angst",
+    english: "the fear",
+    examples: ["Ich habe Angst vor Spinnen. (I'm afraid of spiders.)"],
+  },
+  {
+    german: "die Freude",
+    english: "the joy",
+    examples: [
+      "Zu meiner Freude kam sie doch. (To my joy, she came after all.)",
+    ],
+  },
+  {
+    german: "die Liebe",
+    english: "the love",
+    examples: [
+      "Die Liebe ist manchmal kompliziert. (Love is sometimes complicated.)",
+    ],
+  },
+  {
+    german: "die Wut",
+    english: "the anger",
+    examples: [
+      "Vor Wut konnte er nicht sprechen. (He couldn't speak out of anger.)",
+    ],
+  },
+  {
+    german: "stolz",
+    english: "proud",
+    examples: ["Ich bin stolz auf dich. (I'm proud of you.)"],
+  },
+  {
+    german: "nervös",
+    english: "nervous",
+    examples: [
+      "Vor der Prüfung bin ich nervös. (I'm nervous before the exam.)",
+    ],
+  },
+  {
+    german: "ruhig",
+    english: "calm / quiet",
+    examples: ["Bleib bitte ruhig. (Please stay calm.)"],
+  },
+  {
+    german: "ehrlich",
+    english: "honest",
+    examples: ["Sei ehrlich zu mir. (Be honest with me.)"],
+  },
+  {
+    german: "höflich",
+    english: "polite",
+    examples: ["Er ist immer sehr höflich. (He is always very polite.)"],
+  },
+  {
+    german: "geduldig",
+    english: "patient",
+    examples: [
+      "Meine Lehrerin ist sehr geduldig. (My teacher is very patient.)",
+    ],
+  },
+  {
+    german: "neugierig",
+    english: "curious",
+    examples: ["Kinder sind oft neugierig. (Children are often curious.)"],
+  },
+  {
+    german: "fleißig",
+    english: "hard-working / diligent",
+    examples: ["Sie ist eine fleißige Schülerin. (She is a diligent student.)"],
+  },
+  {
+    german: "faul",
+    english: "lazy",
+    examples: ["Am Sonntag bin ich gern faul. (On Sundays I like being lazy.)"],
+  },
+
+  // ── Health ─────────────────────────────────────────────────────
+  {
+    german: "die Gesundheit",
+    english: "the health",
+    examples: [
+      "Gesundheit ist das Wichtigste. (Health is the most important thing.)",
+    ],
+  },
+  {
+    german: "die Krankheit",
+    english: "the illness",
+    examples: [
+      "Er ist wegen einer Krankheit zu Hause. (He is at home because of an illness.)",
+    ],
+  },
+  {
+    german: "der Termin",
+    english: "the appointment",
+    examples: [
+      "Ich habe morgen einen Termin beim Arzt. (I have a doctor's appointment tomorrow.)",
+    ],
+  },
+  {
+    german: "das Fieber",
+    english: "the fever",
+    examples: ["Das Kind hat hohes Fieber. (The child has a high fever.)"],
+  },
+  {
+    german: "die Erkältung",
+    english: "the cold (illness)",
+    examples: ["Ich habe eine Erkältung. (I have a cold.)"],
+  },
+  {
+    german: "sich fühlen",
+    english: "to feel",
+    examples: ["Ich fühle mich heute besser. (I feel better today.)"],
+  },
+  {
+    german: "wehtun",
+    english: "to hurt",
+    examples: ["Mein Rücken tut weh. (My back hurts.)"],
+  },
+  {
+    german: "verletzt",
+    english: "injured",
+    examples: ["Er ist beim Sport verletzt. (He got injured doing sports.)"],
+  },
+
+  // ── Work & education ───────────────────────────────────────────
+  {
+    german: "die Ausbildung",
+    english: "the vocational training",
+    examples: [
+      "Sie macht eine Ausbildung als Krankenschwester. (She is training to be a nurse.)",
+    ],
+  },
+  {
+    german: "die Stelle",
+    english: "the job / position",
+    examples: ["Ich suche eine neue Stelle. (I'm looking for a new job.)"],
+  },
+  {
+    german: "die Bewerbung",
+    english: "the job application",
+    examples: ["Ich schreibe eine Bewerbung. (I'm writing a job application.)"],
+  },
+  {
+    german: "der Kollege",
+    english: "the colleague",
+    examples: ["Mein Kollege hilft mir oft. (My colleague often helps me.)"],
+  },
+  {
+    german: "die Besprechung",
+    english: "the meeting",
+    examples: [
+      "Die Besprechung dauert eine Stunde. (The meeting lasts an hour.)",
+    ],
+  },
+  {
+    german: "das Gehalt",
+    english: "the salary",
+    examples: ["Mein Gehalt ist nicht sehr hoch. (My salary isn't very high.)"],
+  },
+  {
+    german: "die Erfahrung",
+    english: "the experience",
+    examples: ["Sie hat viel Erfahrung. (She has a lot of experience.)"],
+  },
+  {
+    german: "das Praktikum",
+    english: "the internship",
+    examples: [
+      "Ich mache ein Praktikum bei einer Firma. (I'm doing an internship at a company.)",
+    ],
+  },
+  {
+    german: "verdienen",
+    english: "to earn",
+    examples: ["Sie verdient gut. (She earns well.)"],
+  },
+  {
+    german: "kündigen",
+    english: "to quit / give notice",
+    examples: ["Er hat seinen Job gekündigt. (He quit his job.)"],
+  },
+
+  // ── Travel & holidays ──────────────────────────────────────────
+  {
+    german: "der Ausflug",
+    english: "the excursion / day trip",
+    examples: [
+      "Wir machen einen Ausflug in die Berge. (We're taking a trip to the mountains.)",
+    ],
+  },
+  {
+    german: "die Unterkunft",
+    english: "the accommodation",
+    examples: [
+      "Wir suchen eine günstige Unterkunft. (We're looking for cheap accommodation.)",
+    ],
+  },
+  {
+    german: "das Gepäck",
+    english: "the luggage",
+    examples: ["Mein Gepäck ist sehr schwer. (My luggage is very heavy.)"],
+  },
+  {
+    german: "der Koffer",
+    english: "the suitcase",
+    examples: ["Ich packe meinen Koffer. (I'm packing my suitcase.)"],
+  },
+  {
+    german: "die Grenze",
+    english: "the border",
+    examples: [
+      "An der Grenze müssen wir warten. (We have to wait at the border.)",
+    ],
+  },
+  {
+    german: "das Ausland",
+    english: "abroad / foreign countries",
+    examples: [
+      "Im Ausland spricht man andere Sprachen. (Abroad, people speak other languages.)",
+    ],
+  },
+  {
+    german: "die Sehenswürdigkeit",
+    english: "the sight / attraction",
+    examples: [
+      "Wir besichtigen die Sehenswürdigkeiten. (We're visiting the sights.)",
+    ],
+  },
+  {
+    german: "buchen",
+    english: "to book",
+    examples: ["Ich habe ein Hotel gebucht. (I've booked a hotel.)"],
+  },
+  {
+    german: "übernachten",
+    english: "to stay overnight",
+    examples: [
+      "Wir übernachten in einem Hotel. (We're staying overnight in a hotel.)",
+    ],
+  },
+
+  // ── Environment & nature ───────────────────────────────────────
+  {
+    german: "die Umwelt",
+    english: "the environment",
+    examples: [
+      "Wir müssen die Umwelt schützen. (We must protect the environment.)",
+    ],
+  },
+  {
+    german: "der Müll",
+    english: "the trash / rubbish",
+    examples: ["Bitte trenne den Müll. (Please separate the trash.)"],
+  },
+  {
+    german: "das Klima",
+    english: "the climate",
+    examples: ["Das Klima ändert sich. (The climate is changing.)"],
+  },
+  {
+    german: "die Landschaft",
+    english: "the landscape",
+    examples: ["Die Landschaft ist wunderschön. (The landscape is beautiful.)"],
+  },
+  {
+    german: "die Energie",
+    english: "the energy",
+    examples: ["Wir sparen Energie. (We save energy.)"],
+  },
+  {
+    german: "schützen",
+    english: "to protect",
+    examples: ["Der Wald schützt das Klima. (Forests protect the climate.)"],
+  },
+  {
+    german: "retten",
+    english: "to save / rescue",
+    examples: ["Wir müssen die Tiere retten. (We must save the animals.)"],
+  },
+
+  // ── Media & technology ─────────────────────────────────────────
+  {
+    german: "die Nachricht",
+    english: "the message / news",
+    examples: [
+      "Ich habe dir eine Nachricht geschickt. (I sent you a message.)",
+    ],
+  },
+  {
+    german: "die Zeitung",
+    english: "the newspaper",
+    examples: [
+      "Ich lese jeden Morgen die Zeitung. (I read the newspaper every morning.)",
+    ],
+  },
+  {
+    german: "die Werbung",
+    english: "the advertising",
+    examples: [
+      "Im Fernsehen gibt es viel Werbung. (There's a lot of advertising on TV.)",
+    ],
+  },
+  {
+    german: "die Sendung",
+    english: "the (TV) program",
+    examples: [
+      "Diese Sendung ist sehr beliebt. (This program is very popular.)",
+    ],
+  },
+  {
+    german: "die Datei",
+    english: "the file",
+    examples: ["Die Datei ist zu groß. (The file is too big.)"],
+  },
+  {
+    german: "der Bildschirm",
+    english: "the screen",
+    examples: ["Der Bildschirm ist kaputt. (The screen is broken.)"],
+  },
+  {
+    german: "herunterladen",
+    english: "to download",
+    examples: ["Ich lade die App herunter. (I'm downloading the app.)"],
+  },
+  {
+    german: "speichern",
+    english: "to save (a file)",
+    examples: [
+      "Vergiss nicht, die Datei zu speichern. (Don't forget to save the file.)",
+    ],
+  },
+  {
+    german: "anrufen",
+    english: "to call (on the phone)",
+    examples: ["Ich rufe dich später an. (I'll call you later.)"],
+  },
+
+  // ── Relationships & social ─────────────────────────────────────
+  {
+    german: "die Beziehung",
+    english: "the relationship",
+    examples: [
+      "Sie haben eine gute Beziehung. (They have a good relationship.)",
+    ],
+  },
+  {
+    german: "der Nachbar",
+    english: "the neighbor",
+    examples: ["Mein Nachbar ist sehr nett. (My neighbor is very nice.)"],
+  },
+  {
+    german: "der Gast",
+    english: "the guest",
+    examples: ["Wir haben heute Abend Gäste. (We have guests tonight.)"],
+  },
+  {
+    german: "die Hochzeit",
+    english: "the wedding",
+    examples: ["Die Hochzeit ist im Sommer. (The wedding is in summer.)"],
+  },
+  {
+    german: "das Geschenk",
+    english: "the gift",
+    examples: ["Ich kaufe ein Geschenk für sie. (I'm buying a gift for her.)"],
+  },
+  {
+    german: "die Einladung",
+    english: "the invitation",
+    examples: ["Danke für die Einladung. (Thanks for the invitation.)"],
+  },
+  {
+    german: "einladen",
+    english: "to invite",
+    examples: ["Ich lade dich zum Essen ein. (I'm inviting you to dinner.)"],
+  },
+  {
+    german: "heiraten",
+    english: "to marry",
+    examples: [
+      "Sie heiraten nächstes Jahr. (They're getting married next year.)",
+    ],
+  },
+  {
+    german: "sich verlieben",
+    english: "to fall in love",
+    examples: ["Er hat sich in sie verliebt. (He fell in love with her.)"],
+  },
+  {
+    german: "streiten",
+    english: "to argue / quarrel",
+    examples: ["Die Kinder streiten oft. (The children often argue.)"],
+  },
+
+  // ── Shopping & money ───────────────────────────────────────────
+  {
+    german: "das Angebot",
+    english: "the offer / deal",
+    examples: ["Das ist ein gutes Angebot. (That's a good deal.)"],
+  },
+  {
+    german: "der Preis",
+    english: "the price",
+    examples: ["Der Preis ist zu hoch. (The price is too high.)"],
+  },
+  {
+    german: "die Kasse",
+    english: "the checkout / cashier",
+    examples: ["Bitte zahlen Sie an der Kasse. (Please pay at the checkout.)"],
+  },
+  {
+    german: "die Rechnung",
+    english: "the bill / invoice",
+    examples: ["Die Rechnung, bitte! (The bill, please!)"],
+  },
+  {
+    german: "die Kreditkarte",
+    english: "the credit card",
+    examples: [
+      "Kann ich mit Kreditkarte bezahlen? (Can I pay by credit card?)",
+    ],
+  },
+  {
+    german: "kostenlos",
+    english: "free of charge",
+    examples: ["Der Eintritt ist kostenlos. (Admission is free.)"],
+  },
+  {
+    german: "sparen",
+    english: "to save (money)",
+    examples: ["Ich spare für ein neues Auto. (I'm saving for a new car.)"],
+  },
+  {
+    german: "umtauschen",
+    english: "to exchange",
+    examples: [
+      "Ich möchte diese Hose umtauschen. (I'd like to exchange these trousers.)",
+    ],
+  },
+
+  // ── Opinions & communication ───────────────────────────────────
+  {
+    german: "die Meinung",
+    english: "the opinion",
+    examples: [
+      "Meiner Meinung nach ist das falsch. (In my opinion, that's wrong.)",
+    ],
+  },
+  {
+    german: "der Grund",
+    english: "the reason",
+    examples: ["Was ist der Grund dafür? (What's the reason for that?)"],
+  },
+  {
+    german: "der Vorschlag",
+    english: "the suggestion",
+    examples: ["Ich habe einen Vorschlag. (I have a suggestion.)"],
+  },
+  {
+    german: "das Problem",
+    english: "the problem",
+    examples: ["Wir haben ein Problem. (We have a problem.)"],
+  },
+  {
+    german: "die Lösung",
+    english: "the solution",
+    examples: ["Es gibt eine einfache Lösung. (There's a simple solution.)"],
+  },
+  {
+    german: "der Unterschied",
+    english: "the difference",
+    examples: ["Was ist der Unterschied? (What's the difference?)"],
+  },
+  {
+    german: "die Möglichkeit",
+    english: "the possibility / option",
+    examples: ["Es gibt viele Möglichkeiten. (There are many possibilities.)"],
+  },
+  {
+    german: "erklären",
+    english: "to explain",
+    examples: ["Kannst du mir das erklären? (Can you explain that to me?)"],
+  },
+  {
+    german: "entscheiden",
+    english: "to decide",
+    examples: ["Du musst dich entscheiden. (You have to decide.)"],
+  },
+  {
+    german: "meinen",
+    english: "to mean / think",
+    examples: ["Was meinst du damit? (What do you mean by that?)"],
+  },
+  {
+    german: "vorschlagen",
+    english: "to suggest",
+    examples: ["Ich schlage vor, wir gehen essen. (I suggest we go eat.)"],
+  },
+  {
+    german: "diskutieren",
+    english: "to discuss",
+    examples: ["Wir diskutieren über Politik. (We're discussing politics.)"],
+  },
+
+  // ── Time & sequence ────────────────────────────────────────────
+  {
+    german: "die Zukunft",
+    english: "the future",
+    examples: [
+      "In der Zukunft wird alles digital. (In the future, everything will be digital.)",
+    ],
+  },
+  {
+    german: "die Vergangenheit",
+    english: "the past",
+    examples: [
+      "Denk nicht zu viel an die Vergangenheit. (Don't think too much about the past.)",
+    ],
+  },
+  {
+    german: "der Moment",
+    english: "the moment",
+    examples: ["Einen Moment, bitte. (One moment, please.)"],
+  },
+  {
+    german: "plötzlich",
+    english: "suddenly",
+    examples: ["Plötzlich begann es zu regnen. (Suddenly it started to rain.)"],
+  },
+  {
+    german: "endlich",
+    english: "finally / at last",
+    examples: ["Endlich bist du da! (Finally you're here!)"],
+  },
+  {
+    german: "sofort",
+    english: "immediately",
+    examples: ["Komm bitte sofort her. (Please come here immediately.)"],
+  },
+  {
+    german: "normalerweise",
+    english: "usually",
+    examples: ["Normalerweise stehe ich früh auf. (Usually I get up early.)"],
+  },
+  {
+    german: "zuerst",
+    english: "first / at first",
+    examples: [
+      "Zuerst machen wir die Hausaufgaben. (First we do the homework.)",
+    ],
+  },
+  {
+    german: "danach",
+    english: "afterwards",
+    examples: ["Danach gehen wir ins Kino. (Afterwards we go to the cinema.)"],
+  },
+  {
+    german: "damals",
+    english: "back then",
+    examples: [
+      "Damals war alles anders. (Back then, everything was different.)",
+    ],
+  },
+
+  // ── Connectors ─────────────────────────────────────────────────
+  {
+    german: "deshalb",
+    english: "therefore / that's why",
+    examples: [
+      "Es regnet, deshalb bleibe ich zu Hause. (It's raining, so I'm staying home.)",
+    ],
+  },
+  {
+    german: "trotzdem",
+    english: "nevertheless",
+    examples: [
+      "Es war teuer, trotzdem habe ich es gekauft. (It was expensive; I bought it anyway.)",
+    ],
+  },
+  {
+    german: "obwohl",
+    english: "although",
+    examples: [
+      "Obwohl es regnet, gehe ich spazieren. (Although it's raining, I go for a walk.)",
+    ],
+  },
+  {
+    german: "dass",
+    english: "that (conjunction)",
+    examples: ["Ich glaube, dass er recht hat. (I think that he's right.)"],
+  },
+  {
+    german: "damit",
+    english: "so that",
+    examples: [
+      "Ich lerne, damit ich die Prüfung bestehe. (I study so that I pass the exam.)",
+    ],
+  },
+  {
+    german: "während",
+    english: "during / while",
+    examples: ["Während des Essens sprechen wir. (During the meal we talk.)"],
+  },
+  {
+    german: "außerdem",
+    english: "besides / moreover",
+    examples: [
+      "Es ist spät; außerdem bin ich müde. (It's late; besides, I'm tired.)",
+    ],
+  },
+  {
+    german: "sondern",
+    english: "but (rather)",
+    examples: ["Nicht heute, sondern morgen. (Not today, but tomorrow.)"],
+  },
+  {
+    german: "falls",
+    english: "in case / if",
+    examples: [
+      "Falls es regnet, nimm einen Schirm. (In case it rains, take an umbrella.)",
+    ],
+  },
+
+  // ── More verbs ─────────────────────────────────────────────────
+  {
+    german: "aufstehen",
+    english: "to get up",
+    examples: ["Ich stehe um sechs Uhr auf. (I get up at six.)"],
+  },
+  {
+    german: "anfangen",
+    english: "to begin / start",
+    examples: ["Der Film fängt gleich an. (The film starts soon.)"],
+  },
+  {
+    german: "aufhören",
+    english: "to stop",
+    examples: ["Hör auf zu reden! (Stop talking!)"],
+  },
+  {
+    german: "sich erinnern",
+    english: "to remember",
+    examples: ["Ich erinnere mich an dich. (I remember you.)"],
+  },
+  {
+    german: "sich freuen",
+    english: "to be glad / look forward",
+    examples: [
+      "Ich freue mich auf das Wochenende. (I'm looking forward to the weekend.)",
+    ],
+  },
+  {
+    german: "sich interessieren",
+    english: "to be interested",
+    examples: ["Ich interessiere mich für Musik. (I'm interested in music.)"],
+  },
+  {
+    german: "sich beeilen",
+    english: "to hurry",
+    examples: ["Beeil dich, wir sind spät! (Hurry up, we're late!)"],
+  },
+  {
+    german: "vergessen",
+    english: "to forget",
+    examples: ["Ich habe deinen Namen vergessen. (I forgot your name.)"],
+  },
+  {
+    german: "versuchen",
+    english: "to try",
+    examples: ["Ich versuche, mehr zu lernen. (I try to learn more.)"],
+  },
+  {
+    german: "benutzen",
+    english: "to use",
+    examples: ["Darf ich dein Handy benutzen? (May I use your phone?)"],
+  },
+  {
+    german: "gehören",
+    english: "to belong",
+    examples: ["Das Buch gehört mir. (The book belongs to me.)"],
+  },
+  {
+    german: "passieren",
+    english: "to happen",
+    examples: ["Was ist passiert? (What happened?)"],
+  },
+  {
+    german: "funktionieren",
+    english: "to work / function",
+    examples: ["Das Handy funktioniert nicht. (The phone isn't working.)"],
+  },
+  {
+    german: "wiederholen",
+    english: "to repeat",
+    examples: [
+      "Können Sie das bitte wiederholen? (Can you repeat that, please?)",
+    ],
+  },
+  {
+    german: "empfehlen",
+    english: "to recommend",
+    examples: [
+      "Ich empfehle dieses Restaurant. (I recommend this restaurant.)",
+    ],
+  },
+  {
+    german: "bestellen",
+    english: "to order",
+    examples: ["Ich bestelle eine Pizza. (I'm ordering a pizza.)"],
+  },
+  {
+    german: "mieten",
+    english: "to rent",
+    examples: ["Wir mieten eine Wohnung. (We're renting an apartment.)"],
+  },
+  {
+    german: "reparieren",
+    english: "to repair",
+    examples: ["Er repariert das Fahrrad. (He's repairing the bike.)"],
+  },
+  {
+    german: "sich ausruhen",
+    english: "to rest",
+    examples: ["Ich muss mich ausruhen. (I need to rest.)"],
+  },
+  {
+    german: "teilnehmen",
+    english: "to participate",
+    examples: ["Ich nehme am Kurs teil. (I'm taking part in the course.)"],
+  },
+  {
+    german: "verbringen",
+    english: "to spend (time)",
+    examples: [
+      "Wir verbringen den Urlaub am Meer. (We spend the holiday at the sea.)",
+    ],
+  },
+  {
+    german: "sich vorstellen",
+    english: "to introduce oneself / imagine",
+    examples: ["Darf ich mich vorstellen? (May I introduce myself?)"],
+  },
+
+  // ── More adjectives ────────────────────────────────────────────
+  {
+    german: "möglich",
+    english: "possible",
+    examples: ["Ist das möglich? (Is that possible?)"],
+  },
+  {
+    german: "nötig",
+    english: "necessary",
+    examples: ["Das ist wirklich nicht nötig. (That's really not necessary.)"],
+  },
+  {
+    german: "ähnlich",
+    english: "similar",
+    examples: [
+      "Die beiden sind sich sehr ähnlich. (The two are very similar.)",
+    ],
+  },
+  {
+    german: "verschieden",
+    english: "different / various",
+    examples: ["Es gibt verschiedene Meinungen. (There are various opinions.)"],
+  },
+  {
+    german: "bekannt",
+    english: "well-known",
+    examples: ["Sie ist eine bekannte Autorin. (She is a well-known author.)"],
+  },
+  {
+    german: "berühmt",
+    english: "famous",
+    examples: [
+      "Berlin ist berühmt für seine Kultur. (Berlin is famous for its culture.)",
+    ],
+  },
+  {
+    german: "gefährlich",
+    english: "dangerous",
+    examples: ["Rauchen ist gefährlich. (Smoking is dangerous.)"],
+  },
+  {
+    german: "pünktlich",
+    english: "punctual / on time",
+    examples: ["Der Zug ist pünktlich. (The train is on time.)"],
+  },
+  {
+    german: "modern",
+    english: "modern",
+    examples: ["Die Wohnung ist sehr modern. (The apartment is very modern.)"],
+  },
+  {
+    german: "praktisch",
+    english: "practical",
+    examples: [
+      "Diese Tasche ist sehr praktisch. (This bag is very practical.)",
+    ],
+  },
+  {
+    german: "bequem",
+    english: "comfortable",
+    examples: ["Das Sofa ist sehr bequem. (The sofa is very comfortable.)"],
+  },
+  {
+    german: "sicher",
+    english: "safe / sure",
+    examples: ["Bist du sicher? (Are you sure?)"],
+  },
+  {
+    german: "arm",
+    english: "poor",
+    examples: ["Die Familie ist arm. (The family is poor.)"],
+  },
+  {
+    german: "reich",
+    english: "rich",
+    examples: ["Er ist sehr reich. (He is very rich.)"],
+  },
+  {
+    german: "lustig",
+    english: "funny",
+    examples: ["Der Film ist sehr lustig. (The film is very funny.)"],
+  },
+
+  // ── Abstract nouns & concepts ──────────────────────────────────
+  {
+    german: "die Idee",
+    english: "the idea",
+    examples: ["Das ist eine gute Idee. (That's a good idea.)"],
+  },
+  {
+    german: "das Ziel",
+    english: "the goal",
+    examples: [
+      "Mein Ziel ist es, Deutsch zu lernen. (My goal is to learn German.)",
+    ],
+  },
+  {
+    german: "der Plan",
+    english: "the plan",
+    examples: ["Hast du einen Plan für heute? (Do you have a plan for today?)"],
+  },
+  {
+    german: "die Regel",
+    english: "the rule",
+    examples: ["Das ist gegen die Regeln. (That's against the rules.)"],
+  },
+  {
+    german: "der Fehler",
+    english: "the mistake",
+    examples: ["Jeder macht Fehler. (Everyone makes mistakes.)"],
+  },
+  {
+    german: "der Erfolg",
+    english: "the success",
+    examples: ["Ich wünsche dir viel Erfolg. (I wish you much success.)"],
+  },
+  {
+    german: "die Hilfe",
+    english: "the help",
+    examples: ["Brauchst du Hilfe? (Do you need help?)"],
+  },
+  {
+    german: "die Politik",
+    english: "the politics",
+    examples: [
+      "Er interessiert sich für Politik. (He's interested in politics.)",
+    ],
+  },
+  {
+    german: "die Geschichte",
+    english: "the history / story",
+    examples: ["Erzähl mir eine Geschichte. (Tell me a story.)"],
+  },
+  {
+    german: "die Kultur",
+    english: "the culture",
+    examples: ["Ich liebe die deutsche Kultur. (I love German culture.)"],
+  },
+  {
+    german: "die Wahrheit",
+    english: "the truth",
+    examples: ["Sag mir die Wahrheit. (Tell me the truth.)"],
+  },
+];
+
+/** Turn a raw entry into a full Flashcard tagged with its CEFR level. */
+function toCard(entry: SeedEntry, cefr: CefrLevel, index: number): Flashcard {
+  return {
+    id: `seed-${index}`,
     german: entry.german,
     english: entry.english,
     examples: entry.examples,
+    cefr,
     level: 1,
     timesSeen: 0,
     timesKnown: 0,
     createdAt: 0,
     lastReviewedAt: null,
     lastKnownAt: null,
-  }));
+  };
+}
+
+/**
+ * Build the full seeded deck: all A1 cards (unchanged) followed by the A2 set.
+ * IDs stay stable and sequential across both levels so they never collide with
+ * user-created cards.
+ */
+export function seedCards(): Flashcard[] {
+  return [
+    ...A1_SEED.map((entry, i) => toCard(entry, "A1", i)),
+    ...A2_SEED.map((entry, i) => toCard(entry, "A2", A1_SEED.length + i)),
+  ];
 }

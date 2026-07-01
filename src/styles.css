@@ -112,7 +112,8 @@ body {
   color: var(--muted);
 }
 input,
-textarea {
+textarea,
+select {
   font: inherit;
   padding: 11px 13px;
   border: 1px solid var(--border);
@@ -125,10 +126,37 @@ textarea {
     box-shadow 0.15s;
 }
 input:focus,
-textarea:focus {
+textarea:focus,
+select:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* CEFR level badge (A1 / A2) */
+.cefr-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.cefr-chip--A1 {
+  background: #e0e7ff;
+  color: #4338ca;
+}
+.cefr-chip--A2 {
+  background: #fde2e4;
+  color: #be185d;
+}
+.cefr-chip--corner {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+.card-list__item .cefr-chip {
+  margin-right: 8px;
 }
 
 /* Buttons */
@@ -252,6 +280,7 @@ textarea:focus {
   border-top: 1px solid var(--border);
 }
 .flashcard {
+  position: relative;
   padding: 28px 16px;
   border: 1px dashed var(--border);
   border-radius: var(--radius);
