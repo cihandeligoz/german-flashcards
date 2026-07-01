@@ -1,14 +1,10 @@
-import { useMemo } from "react";
-import type { AppState } from "../types";
-import { computeStats } from "../stats";
+import type { Stats as StatsData } from "@/domain";
 
 interface Props {
-  state: AppState;
+  stats: StatsData;
 }
 
-export function Stats({ state }: Props) {
-  const stats = useMemo(() => computeStats(state, Date.now()), [state]);
-
+export function Stats({ stats }: Props) {
   const successLabel =
     stats.successRate === null
       ? "—"

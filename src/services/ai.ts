@@ -32,7 +32,10 @@ export async function generateExamples(
       model: MODEL,
       temperature: 0.7,
       messages: [
-        { role: "system", content: "You are a concise, accurate German tutor." },
+        {
+          role: "system",
+          content: "You are a concise, accurate German tutor.",
+        },
         { role: "user", content: prompt },
       ],
     }),

@@ -11,6 +11,7 @@ to add a professional quality baseline (lint + format + tests + hooks + CI) and 
 architectural refactor that decouples state from the root component — without a heavy rewrite.
 
 Scope decisions confirmed with the user:
+
 - **Testing:** unit (Vitest) **+ component** (React Testing Library + jsdom).
 - **Architecture:** **moderate** — `useFlashcards` hook backed by `useReducer`, centralized
   domain layer, barrel exports, path aliases.
@@ -43,6 +44,7 @@ Reorganize `src/` into intent-revealing folders and lift state out of `App.tsx`.
 so imports stay stable across the moves.
 
 **Target layout:**
+
 ```
 src/
   domain/     types.ts, srs.ts, stats.ts, seed.ts      (pure logic + data, React-free)
@@ -53,18 +55,20 @@ src/
   components/ AddCard.tsx, Stats.tsx, StudyMode.tsx      (UI only)
   App.tsx, main.tsx, styles.css, vite-env.d.ts
 ```
+
 Each folder gets a barrel `index.ts` re-exporting its public API (e.g. `@/domain`, `@/services`).
 
 **State decoupling:**
+
 - `src/state/reducer.ts` — pure `flashcardsReducer(state, action)` with actions
   `ADD_CARD | DELETE_CARD | ANSWER_CARD`. `ANSWER_CARD` reuses `reviewCard` (`src/domain/srs.ts`)
   and appends a `ReviewEvent`. Fully unit-testable with no React.
 - `src/hooks/useFlashcards.ts` — wraps `useReducer(flashcardsReducer, undefined, loadState)`,
   wires persistence (`useEffect` → `saveState`), and returns `{ state, addCard, deleteCard,
-  answerCard, stats }` (memoized `computeStats`). This replaces the inline logic in `App.tsx`.
+answerCard, stats }` (memoized `computeStats`). This replaces the inline logic in `App.tsx`.
 - `src/hooks/useStudySession.ts` — encapsulates `StudyMode`'s `order`/`pos`/`revealed` +
   membership-signature logic (currently in the component), exposing `{ card, position, total,
-  revealed, reveal, next, prev, answer, canPrev }`. Makes the study flow testable in isolation.
+revealed, reveal, next, prev, answer, canPrev }`. Makes the study flow testable in isolation.
 - `App.tsx` shrinks to composition + tab nav; `StudyMode.tsx` consumes `useStudySession`.
 
 **Cleanups:** remove the dead `pickNextCard` export; centralize `makeId` in `src/lib/id.ts`.

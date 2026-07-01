@@ -32,5 +32,12 @@ export interface AppState {
   seedVersion?: number;
 }
 
+/** The user-provided fields for a new card, before defaults/ids are applied. */
+export interface NewCardInput {
+  german: string;
+  english: string;
+  examples: string[];
+}
+
 export const MIN_LEVEL = 1;
 export const MAX_LEVEL = 5;

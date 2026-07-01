@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Flashcard } from "../types";
-import { generateExamples } from "../ai";
+import type { Flashcard, NewCardInput } from "@/domain";
+import { generateExamples } from "@/services";
 
 interface Props {
-  onAdd: (data: { german: string; english: string; examples: string[] }) => void;
+  onAdd: (data: NewCardInput) => void;
   onDelete: (id: string) => void;
   cards: Flashcard[];
 }
@@ -28,10 +28,14 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
       const examples = await generateExamples(german.trim(), english.trim());
       setExamplesText((prev) => {
         const existing = prev.trim();
-        return existing ? `${existing}\n${examples.join("\n")}` : examples.join("\n");
+        return existing
+          ? `${existing}\n${examples.join("\n")}`
+          : examples.join("\n");
       });
     } catch (err) {
-      setAiError(err instanceof Error ? err.message : "Failed to generate examples.");
+      setAiError(
+        err instanceof Error ? err.message : "Failed to generate examples.",
+      );
     } finally {
       setGenerating(false);
     }
@@ -43,7 +47,10 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
     onAdd({
       german,
       english,
-      examples: examplesText.split("\n").map((l) => l.trim()).filter(Boolean),
+      examples: examplesText
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean),
     });
     setGerman("");
     setEnglish("");
@@ -94,7 +101,11 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
           >
             {generating ? "Generating…" : "✨ Generate examples with AI"}
           </button>
-          <button type="submit" className="btn btn--primary" disabled={!canSubmit}>
+          <button
+            type="submit"
+            className="btn btn--primary"
+            disabled={!canSubmit}
+          >
             Add card
           </button>
         </div>
@@ -115,7 +126,9 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
                 <div>
                   <strong>{c.german}</strong>
                   <span className="muted"> — {c.english}</span>
-                  <span className={`pill pill--lvl${c.level}`}>lvl {c.level}</span>
+                  <span className={`pill pill--lvl${c.level}`}>
+                    lvl {c.level}
+                  </span>
                 </div>
                 <button
                   className="btn btn--danger btn--small"

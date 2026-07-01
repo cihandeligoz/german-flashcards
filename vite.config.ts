@@ -1,3 +1,5 @@
+/// <reference types="vitest/config" />
+import { fileURLToPath, URL } from "node:url";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 
@@ -13,6 +15,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
+    resolve: {
+      alias: {
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
+      },
+    },
     server: {
       proxy: {
         "/api/ai": {
@@ -29,6 +36,23 @@ export default defineConfig(({ mode }) => {
             });
           },
         },
+      },
+    },
+    test: {
+      environment: "jsdom",
+      setupFiles: ["./src/test/setup.ts"],
+      css: false,
+      coverage: {
+        provider: "v8",
+        reporter: ["text", "html"],
+        include: ["src/**/*.{ts,tsx}"],
+        exclude: [
+          "src/**/*.test.{ts,tsx}",
+          "src/**/index.ts",
+          "src/test/**",
+          "src/main.tsx",
+          "src/vite-env.d.ts",
+        ],
       },
     },
   };

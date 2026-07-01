@@ -29,8 +29,7 @@ export function computeStats(state: AppState, now: number): Stats {
   }
 
   const knownCount = reviews.filter((r: ReviewEvent) => r.knew).length;
-  const successRate =
-    reviews.length > 0 ? knownCount / reviews.length : null;
+  const successRate = reviews.length > 0 ? knownCount / reviews.length : null;
 
   return {
     totalCards: cards.length,

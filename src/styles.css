@@ -20,7 +20,12 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -64,7 +69,9 @@ body {
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 .tab:hover {
   color: var(--text);
@@ -113,7 +120,9 @@ textarea {
   background: #fbfcfe;
   color: var(--text);
   resize: vertical;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
 }
 input:focus,
 textarea:focus {
@@ -139,7 +148,10 @@ textarea:focus {
   border-radius: 10px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 0.05s, background 0.15s, opacity 0.15s;
+  transition:
+    transform 0.05s,
+    background 0.15s,
+    opacity 0.15s;
 }
 .btn:active {
   transform: translateY(1px);
@@ -204,11 +216,21 @@ textarea:focus {
   color: #fff;
   background: var(--muted);
 }
-.pill--lvl1 { background: #dc2626; }
-.pill--lvl2 { background: #f59e0b; }
-.pill--lvl3 { background: #eab308; }
-.pill--lvl4 { background: #84cc16; }
-.pill--lvl5 { background: #16a34a; }
+.pill--lvl1 {
+  background: #dc2626;
+}
+.pill--lvl2 {
+  background: #f59e0b;
+}
+.pill--lvl3 {
+  background: #eab308;
+}
+.pill--lvl4 {
+  background: #84cc16;
+}
+.pill--lvl5 {
+  background: #16a34a;
+}
 
 /* Study mode */
 .study {

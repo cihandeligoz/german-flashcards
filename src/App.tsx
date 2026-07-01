@@ -1,57 +1,12 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import type { AppState, Flashcard } from "./types";
-import { loadState, saveState } from "./storage";
-import { reviewCard } from "./srs";
-import { AddCard } from "./components/AddCard";
-import { StudyMode } from "./components/StudyMode";
-import { Stats } from "./components/Stats";
+import { useMemo, useState } from "react";
+import { useFlashcards } from "@/hooks";
+import { AddCard, Stats, StudyMode } from "@/components";
 
 type Tab = "study" | "add" | "stats";
 
-function makeId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
 export function App() {
-  const [state, setState] = useState<AppState>(() => loadState());
+  const { state, stats, addCard, deleteCard, answerCard } = useFlashcards();
   const [tab, setTab] = useState<Tab>("study");
-
-  // Persist on every change.
-  useEffect(() => {
-    saveState(state);
-  }, [state]);
-
-  const addCard = useCallback(
-    (data: { german: string; english: string; examples: string[] }) => {
-      const now = Date.now();
-      const card: Flashcard = {
-        id: makeId(),
-        german: data.german.trim(),
-        english: data.english.trim(),
-        examples: data.examples.map((e) => e.trim()).filter(Boolean),
-        level: 1,
-        timesSeen: 0,
-        timesKnown: 0,
-        createdAt: now,
-        lastReviewedAt: null,
-        lastKnownAt: null,
-      };
-      setState((s) => ({ ...s, cards: [...s.cards, card] }));
-    },
-    [],
-  );
-
-  const deleteCard = useCallback((id: string) => {
-    setState((s) => ({ ...s, cards: s.cards.filter((c) => c.id !== id) }));
-  }, []);
-
-  const answerCard = useCallback((id: string, knew: boolean) => {
-    const now = Date.now();
-    setState((s) => ({
-      cards: s.cards.map((c) => (c.id === id ? reviewCard(c, knew, now) : c)),
-      reviews: [...s.reviews, { cardId: id, knew, at: now }],
-    }));
-  }, []);
 
   const tabs: { key: Tab; label: string }[] = useMemo(
     () => [
@@ -90,13 +45,9 @@ export function App() {
           />
         )}
         {tab === "add" && (
-          <AddCard
-            onAdd={addCard}
-            cards={state.cards}
-            onDelete={deleteCard}
-          />
+          <AddCard onAdd={addCard} cards={state.cards} onDelete={deleteCard} />
         )}
-        {tab === "stats" && <Stats state={state} />}
+        {tab === "stats" && <Stats stats={stats} />}
       </main>
     </div>
   );

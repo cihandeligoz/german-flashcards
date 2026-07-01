@@ -1,5 +1,4 @@
-import type { AppState } from "./types";
-import { seedCards } from "./seed";
+import { seedCards, type AppState } from "@/domain";
 
 const STORAGE_KEY = "deutsch-flashcards-v2";
 
