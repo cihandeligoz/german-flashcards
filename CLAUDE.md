@@ -49,3 +49,14 @@ Data flow is unidirectional: components call `useFlashcards` callbacks → reduc
 
 - `tsc -b` uses project references (`tsconfig.app.json` for `src/`, `tsconfig.node.json` for `vite.config.ts`). `noUncheckedIndexedAccess` is on, so array/index access is `T | undefined` — guard or assert (`arr[i]!`) deliberately.
 - Nouns in the seed data carry their article (der/die/das) as part of the German field.
+
+## Commit Message Rules
+
+- Use conventional commits format: `<type>(<scope>): <description>`
+- Types: `feat`, `fix`, `refactor`, `test`, `chore`, `docs`
+- The description must name the concrete behavior or change, not vague verbs like "add", "update", or "begin".
+  - Bad: "Add map test" / Good: `test(map): verify vehicle positions load on monitoring overview`
+  - Bad: "Update TC 4.2" / Good: `test(auth): TC 4.2 — confirm login fails with expired token`
+- If a ticket/TC reference exists, always append a short summary of what it verifies.
+- Use the commit body when context is needed: first line = _what_, body = _why_ or what gap it closes.
+- Never write two commits that look identical in `git log` without opening the diff.
