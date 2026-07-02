@@ -44,7 +44,9 @@ export function loadState(): AppState {
       typeof parsed.seedVersion === "number" ? parsed.seedVersion : 0;
     const studyLevels = normalizeLevels(parsed.studyLevels);
 
-    // Nothing to lose — seed it.
+    // Nothing to lose — seed it. This (and the re-seed branch below) returns
+    // initialState(), which resets studyLevels to []: the deck is being
+    // replaced wholesale, so reverting the level filter to "All" is intentional.
     if (cards.length === 0 && reviews.length === 0) return initialState();
 
     // Ensure every card carries a `cefr` badge — decks stored before v3 predate
@@ -56,7 +58,8 @@ export function loadState(): AppState {
       return { cards: normalized, reviews, seedVersion, studyLevels };
 
     // Deck came from an older seed. If it's untouched (no custom cards, no
-    // study history) just refresh to the current vocabulary.
+    // study history) just refresh to the current vocabulary — this reseed also
+    // resets studyLevels to [] via initialState(), as noted above.
     const hasUserCards = cards.some((c) => !c.id.startsWith("seed-"));
     if (reviews.length === 0 && !hasUserCards) return initialState();
 
