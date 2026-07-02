@@ -1,5 +1,10 @@
 import { useState } from "react";
-import type { CefrLevel, Flashcard, NewCardInput } from "@/domain";
+import {
+  CEFR_LEVELS,
+  type CefrLevel,
+  type Flashcard,
+  type NewCardInput,
+} from "@/domain";
 import { generateExamples } from "@/services";
 
 interface Props {
@@ -91,8 +96,11 @@ export function AddCard({ onAdd, onDelete, cards }: Props) {
             value={cefr}
             onChange={(e) => setCefr(e.target.value as CefrLevel)}
           >
-            <option value="A1">A1</option>
-            <option value="A2">A2</option>
+            {CEFR_LEVELS.map((l) => (
+              <option key={l} value={l}>
+                {l}
+              </option>
+            ))}
           </select>
         </label>
 

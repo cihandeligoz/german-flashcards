@@ -1,4 +1,9 @@
-import { seedCards, type AppState } from "@/domain";
+import {
+  CEFR_LEVELS,
+  seedCards,
+  type AppState,
+  type CefrLevel,
+} from "@/domain";
 
 const STORAGE_KEY = "deutsch-flashcards-v2";
 
@@ -8,9 +13,23 @@ const STORAGE_KEY = "deutsch-flashcards-v2";
 // v3 added the A2 vocabulary set and the `cefr` badge field.
 const SEED_VERSION = 3;
 
-/** First-run state: seeded with the current A1 vocabulary. */
+/**
+ * Keep only valid, de-duplicated CEFR levels from persisted input; anything
+ * unrecognized (or a non-array) collapses to `[]`, i.e. "all levels".
+ */
+function normalizeLevels(v: unknown): CefrLevel[] {
+  if (!Array.isArray(v)) return [];
+  return CEFR_LEVELS.filter((l) => v.includes(l));
+}
+
+/** First-run state: seeded with the current A1 vocabulary; no level filter. */
 function initialState(): AppState {
-  return { cards: seedCards(), reviews: [], seedVersion: SEED_VERSION };
+  return {
+    cards: seedCards(),
+    reviews: [],
+    seedVersion: SEED_VERSION,
+    studyLevels: [],
+  };
 }
 
 export function loadState(): AppState {
@@ -23,8 +42,11 @@ export function loadState(): AppState {
     const reviews = Array.isArray(parsed.reviews) ? parsed.reviews : [];
     const seedVersion =
       typeof parsed.seedVersion === "number" ? parsed.seedVersion : 0;
+    const studyLevels = normalizeLevels(parsed.studyLevels);
 
-    // Nothing to lose — seed it.
+    // Nothing to lose — seed it. This (and the re-seed branch below) returns
+    // initialState(), which resets studyLevels to []: the deck is being
+    // replaced wholesale, so reverting the level filter to "All" is intentional.
     if (cards.length === 0 && reviews.length === 0) return initialState();
 
     // Ensure every card carries a `cefr` badge — decks stored before v3 predate
@@ -33,10 +55,11 @@ export function loadState(): AppState {
 
     // Deck is up to date — return as-is.
     if (seedVersion >= SEED_VERSION)
-      return { cards: normalized, reviews, seedVersion };
+      return { cards: normalized, reviews, seedVersion, studyLevels };
 
     // Deck came from an older seed. If it's untouched (no custom cards, no
-    // study history) just refresh to the current vocabulary.
+    // study history) just refresh to the current vocabulary — this reseed also
+    // resets studyLevels to [] via initialState(), as noted above.
     const hasUserCards = cards.some((c) => !c.id.startsWith("seed-"));
     if (reviews.length === 0 && !hasUserCards) return initialState();
 
@@ -52,11 +75,17 @@ export function loadState(): AppState {
         cards: [...normalized, ...additions],
         reviews,
         seedVersion: SEED_VERSION,
+        studyLevels,
       };
     }
 
     // Purely user-built deck — don't inject seed cards; just record the version.
-    return { cards: normalized, reviews, seedVersion: SEED_VERSION };
+    return {
+      cards: normalized,
+      reviews,
+      seedVersion: SEED_VERSION,
+      studyLevels,
+    };
   } catch {
     // Corrupt or unavailable storage — start fresh rather than crashing.
     return initialState();

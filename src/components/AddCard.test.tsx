@@ -34,6 +34,12 @@ describe("AddCard", () => {
     });
   });
 
+  it("offers all five CEFR levels in the selector", () => {
+    render(<AddCard cards={[]} onAdd={vi.fn()} onDelete={vi.fn()} />);
+    const options = screen.getAllByRole("option").map((o) => o.textContent);
+    expect(options).toEqual(["A1", "A2", "B1", "B2", "C1"]);
+  });
+
   it("fills the examples field from the AI generator", async () => {
     const user = userEvent.setup();
     vi.mocked(generateExamples).mockResolvedValue([

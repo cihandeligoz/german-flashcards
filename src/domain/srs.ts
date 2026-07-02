@@ -1,4 +1,4 @@
-import { MAX_LEVEL, MIN_LEVEL, type Flashcard } from "./types";
+import { MAX_LEVEL, MIN_LEVEL, type CefrLevel, type Flashcard } from "./types";
 
 /**
  * Selection weight for a card: lower Leitner levels get exponentially more
@@ -20,6 +20,16 @@ export function buildStudyOrder(cards: Flashcard[]): string[] {
     .map((c) => ({ id: c.id, key: Math.random() ** (1 / cardWeight(c)) }))
     .sort((a, b) => b.key - a.key)
     .map((x) => x.id);
+}
+
+/** Cards restricted to the given CEFR levels. Empty `levels` = no filter. */
+export function filterByLevels(
+  cards: Flashcard[],
+  levels: CefrLevel[],
+): Flashcard[] {
+  return levels.length === 0
+    ? cards
+    : cards.filter((c) => levels.includes(c.cefr));
 }
 
 /** Apply the result of a review, returning a new card object (immutable). */
