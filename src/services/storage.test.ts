@@ -63,6 +63,27 @@ describe("storage", () => {
     expect(state.reviews).toHaveLength(1);
   });
 
+  it("tops up a seed-derived deck with new vocabulary while keeping progress", () => {
+    // A studied deck from an older seed version: only a couple of seed cards.
+    const partial: AppState = {
+      cards: [
+        { ...userCard(), id: "seed-0" },
+        { ...userCard(), id: "seed-5" },
+      ],
+      reviews: [{ cardId: "seed-0", knew: true, at: 10 }],
+      seedVersion: 2,
+    };
+    localStorage.setItem(KEY, JSON.stringify(partial));
+
+    const state = loadState();
+    expect(state.seedVersion).toBe(3);
+    // New seed cards were appended, existing ones (and progress) preserved.
+    expect(state.cards.length).toBeGreaterThan(100);
+    const seed0 = state.cards.find((c) => c.id === "seed-0")!;
+    expect(seed0.level).toBe(userCard().level); // level 3 kept, not reset
+    expect(state.reviews).toHaveLength(1);
+  });
+
   it("round-trips state through save and load", () => {
     const original = loadState();
     saveState(original);

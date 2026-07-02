@@ -27,17 +27,36 @@ export function loadState(): AppState {
     // Nothing to lose — seed it.
     if (cards.length === 0 && reviews.length === 0) return initialState();
 
-    // Deck came from an older seed and the user hasn't personalized it (no
-    // custom cards, no reviews) — refresh to the current vocabulary.
+    // Ensure every card carries a `cefr` badge — decks stored before v3 predate
+    // the field, so default them to A1.
+    const normalized = cards.map((c) => ({ ...c, cefr: c.cefr ?? "A1" }));
+
+    // Deck is up to date — return as-is.
+    if (seedVersion >= SEED_VERSION)
+      return { cards: normalized, reviews, seedVersion };
+
+    // Deck came from an older seed. If it's untouched (no custom cards, no
+    // study history) just refresh to the current vocabulary.
     const hasUserCards = cards.some((c) => !c.id.startsWith("seed-"));
-    if (seedVersion < SEED_VERSION && reviews.length === 0 && !hasUserCards) {
-      return initialState();
+    if (reviews.length === 0 && !hasUserCards) return initialState();
+
+    // Otherwise the user has progress: keep their cards but top up any seed
+    // cards added since (e.g. the A2 set) so new vocabulary reaches everyone
+    // without discarding history. Matching is by id, so existing progress and
+    // custom cards are untouched.
+    const hasSeedCards = cards.some((c) => c.id.startsWith("seed-"));
+    if (hasSeedCards) {
+      const haveIds = new Set(normalized.map((c) => c.id));
+      const additions = seedCards().filter((c) => !haveIds.has(c.id));
+      return {
+        cards: [...normalized, ...additions],
+        reviews,
+        seedVersion: SEED_VERSION,
+      };
     }
 
-    // A personalized deck is kept as-is, but ensure every card carries a `cefr`
-    // badge — decks stored before v3 predate the field, so default them to A1.
-    const normalized = cards.map((c) => ({ ...c, cefr: c.cefr ?? "A1" }));
-    return { cards: normalized, reviews, seedVersion };
+    // Purely user-built deck — don't inject seed cards; just record the version.
+    return { cards: normalized, reviews, seedVersion: SEED_VERSION };
   } catch {
     // Corrupt or unavailable storage — start fresh rather than crashing.
     return initialState();
