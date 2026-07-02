@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useReducer } from "react";
 import {
   computeStats,
   type AppState,
+  type CefrLevel,
   type NewCardInput,
   type Stats,
 } from "@/domain";
@@ -15,6 +16,7 @@ export interface UseFlashcards {
   addCard: (input: NewCardInput) => void;
   deleteCard: (id: string) => void;
   answerCard: (id: string, knew: boolean) => void;
+  setStudyLevels: (levels: CefrLevel[]) => void;
 }
 
 /**
@@ -41,7 +43,11 @@ export function useFlashcards(): UseFlashcards {
     dispatch({ type: "ANSWER_CARD", id, knew, now: Date.now() });
   }, []);
 
+  const setStudyLevels = useCallback((levels: CefrLevel[]) => {
+    dispatch({ type: "SET_STUDY_LEVELS", levels });
+  }, []);
+
   const stats = useMemo(() => computeStats(state, Date.now()), [state]);
 
-  return { state, stats, addCard, deleteCard, answerCard };
+  return { state, stats, addCard, deleteCard, answerCard, setStudyLevels };
 }

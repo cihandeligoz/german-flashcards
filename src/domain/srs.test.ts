@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cardWeight, buildStudyOrder, reviewCard } from "./srs";
+import { cardWeight, buildStudyOrder, filterByLevels, reviewCard } from "./srs";
 import type { Flashcard } from "./types";
 
 function makeCard(overrides: Partial<Flashcard> = {}): Flashcard {
@@ -78,5 +78,28 @@ describe("buildStudyOrder", () => {
 
   it("returns an empty order for an empty deck", () => {
     expect(buildStudyOrder([])).toEqual([]);
+  });
+});
+
+describe("filterByLevels", () => {
+  const a1 = makeCard({ id: "a1", cefr: "A1" });
+  const a2 = makeCard({ id: "a2", cefr: "A2" });
+  const b1 = makeCard({ id: "b1", cefr: "B1" });
+  const cards = [a1, a2, b1];
+
+  it("returns all cards when no levels are selected", () => {
+    expect(filterByLevels(cards, [])).toEqual(cards);
+  });
+
+  it("keeps only cards at a single selected level", () => {
+    expect(filterByLevels(cards, ["A2"])).toEqual([a2]);
+  });
+
+  it("returns the union across multiple selected levels", () => {
+    expect(filterByLevels(cards, ["A1", "B1"])).toEqual([a1, b1]);
+  });
+
+  it("returns no cards when the selected level has none", () => {
+    expect(filterByLevels(cards, ["C1"])).toEqual([]);
   });
 });

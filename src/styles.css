@@ -133,7 +133,7 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
-/* CEFR level badge (A1 / A2) */
+/* CEFR level badge (A1–C1) */
 .cefr-chip {
   display: inline-block;
   padding: 2px 8px;
@@ -150,6 +150,18 @@ select:focus {
   background: #fde2e4;
   color: #be185d;
 }
+.cefr-chip--B1 {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+.cefr-chip--B2 {
+  background: #fef3c7;
+  color: #b45309;
+}
+.cefr-chip--C1 {
+  background: #ede9fe;
+  color: #6d28d9;
+}
 .cefr-chip--corner {
   position: absolute;
   top: 12px;
@@ -157,6 +169,41 @@ select:focus {
 }
 .card-list__item .cefr-chip {
   margin-right: 8px;
+}
+
+/* Study-mode level filter (All + A1–C1) */
+.level-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.level-chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+.level-chip:hover {
+  border-color: var(--primary);
+}
+.level-chip--active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.empty__hint {
+  color: var(--muted);
+  text-align: center;
+  padding: 24px 8px;
 }
 
 /* Buttons */

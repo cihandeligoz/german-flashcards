@@ -41,6 +41,23 @@ describe("flashcardsReducer", () => {
     expect(next.cards).toHaveLength(0);
   });
 
+  it("sets the study levels without touching cards or reviews", () => {
+    const withCard = flashcardsReducer(empty, {
+      type: "ADD_CARD",
+      input: { german: "a", english: "a", cefr: "A1", examples: [] },
+      id: "x",
+      now: 0,
+    });
+    const next = flashcardsReducer(withCard, {
+      type: "SET_STUDY_LEVELS",
+      levels: ["A2", "B1"],
+    });
+
+    expect(next.studyLevels).toEqual(["A2", "B1"]);
+    expect(next.cards).toBe(withCard.cards); // untouched reference
+    expect(next.reviews).toBe(withCard.reviews);
+  });
+
   it("records a review and updates the card on answer", () => {
     const withCard = flashcardsReducer(empty, {
       type: "ADD_CARD",

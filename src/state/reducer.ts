@@ -1,6 +1,7 @@
 import {
   reviewCard,
   type AppState,
+  type CefrLevel,
   type Flashcard,
   type NewCardInput,
 } from "@/domain";
@@ -12,7 +13,8 @@ import {
 export type FlashcardAction =
   | { type: "ADD_CARD"; input: NewCardInput; id: string; now: number }
   | { type: "DELETE_CARD"; id: string }
-  | { type: "ANSWER_CARD"; id: string; knew: boolean; now: number };
+  | { type: "ANSWER_CARD"; id: string; knew: boolean; now: number }
+  | { type: "SET_STUDY_LEVELS"; levels: CefrLevel[] };
 
 export function flashcardsReducer(
   state: AppState,
@@ -37,6 +39,8 @@ export function flashcardsReducer(
     }
     case "DELETE_CARD":
       return { ...state, cards: state.cards.filter((c) => c.id !== action.id) };
+    case "SET_STUDY_LEVELS":
+      return { ...state, studyLevels: action.levels };
     case "ANSWER_CARD":
       return {
         ...state,

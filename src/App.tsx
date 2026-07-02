@@ -5,7 +5,8 @@ import { AddCard, Stats, StudyMode } from "@/components";
 type Tab = "study" | "add" | "stats";
 
 export function App() {
-  const { state, stats, addCard, deleteCard, answerCard } = useFlashcards();
+  const { state, stats, addCard, deleteCard, answerCard, setStudyLevels } =
+    useFlashcards();
   const [tab, setTab] = useState<Tab>("study");
 
   const tabs: { key: Tab; label: string }[] = useMemo(
@@ -42,6 +43,8 @@ export function App() {
             cards={state.cards}
             onAnswer={answerCard}
             goToAdd={() => setTab("add")}
+            selectedLevels={state.studyLevels ?? []}
+            onLevelsChange={setStudyLevels}
           />
         )}
         {tab === "add" && (

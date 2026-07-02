@@ -84,6 +84,55 @@ describe("storage", () => {
     expect(state.reviews).toHaveLength(1);
   });
 
+  it("defaults studyLevels to an empty selection when absent", () => {
+    expect(loadState().studyLevels).toEqual([]);
+  });
+
+  it("preserves a valid persisted study-level selection", () => {
+    const personalized: AppState = {
+      cards: [userCard()],
+      reviews: [{ cardId: "user-1", knew: true, at: 10 }],
+      seedVersion: 3,
+      studyLevels: ["A2", "B1"],
+    };
+    localStorage.setItem(KEY, JSON.stringify(personalized));
+    expect(loadState().studyLevels).toEqual(["A2", "B1"]);
+  });
+
+  it("carries the study-level selection through the top-up branch", () => {
+    const partial: AppState = {
+      cards: [
+        { ...userCard(), id: "seed-0" },
+        { ...userCard(), id: "seed-5" },
+      ],
+      reviews: [{ cardId: "seed-0", knew: true, at: 10 }],
+      seedVersion: 2,
+      studyLevels: ["B2"],
+    };
+    localStorage.setItem(KEY, JSON.stringify(partial));
+
+    const state = loadState();
+    expect(state.studyLevels).toEqual(["B2"]);
+    expect(state.cards.length).toBeGreaterThan(100); // still topped up
+  });
+
+  it("drops invalid study-level entries, normalized to display order", () => {
+    const personalized: AppState = {
+      cards: [userCard()],
+      reviews: [{ cardId: "user-1", knew: true, at: 10 }],
+      seedVersion: 3,
+      // "Z9" is bogus; "A1"/"B1" out of order and B1 duplicated.
+      studyLevels: [
+        "B1",
+        "Z9",
+        "A1",
+        "B1",
+      ] as unknown as AppState["studyLevels"],
+    };
+    localStorage.setItem(KEY, JSON.stringify(personalized));
+    expect(loadState().studyLevels).toEqual(["A1", "B1"]);
+  });
+
   it("round-trips state through save and load", () => {
     const original = loadState();
     saveState(original);
