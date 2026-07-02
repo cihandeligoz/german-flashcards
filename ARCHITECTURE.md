@@ -2,7 +2,7 @@
 
 A React 18 + Vite + TypeScript single-page app for studying German flashcards. No backend, no routing, no state library — everything persists to `localStorage`. Layers are separated by intent and imported via the `@/` alias (→ `src/`), each folder exposing a barrel `index.ts`:
 
-- **`src/domain/`** — pure, framework-free model + logic; **never import React here**. `types.ts` (Flashcard/ReviewEvent/AppState), `srs.ts` (spaced repetition), `stats.ts`, `seed.ts` (~318-word Goethe A1 seed deck).
+- **`src/domain/`** — pure, framework-free model + logic; **never import React here**. `types.ts` (Flashcard/ReviewEvent/AppState), `srs.ts` (spaced repetition), `stats.ts`, `seed.ts` (~470-card Goethe seed deck: 318 A1 + 154 A2 words).
 - **`src/services/`** — side-effectful adapters: `storage.ts` (localStorage + migration) and `ai.ts` (network).
 - **`src/state/reducer.ts`** — the pure `flashcardsReducer` (`ADD_CARD`/`DELETE_CARD`/`ANSWER_CARD`). Non-deterministic inputs (id, timestamps) are passed **in the action** so the reducer stays deterministic and unit-testable.
 - **`src/hooks/`** — `useFlashcards` is the single store: `useReducer(flashcardsReducer, undefined, loadState)` + a `useEffect` that `saveState`s the whole `AppState` on every change; it injects `makeId()`/`Date.now()` at dispatch time. `useStudySession` owns the study cursor.
